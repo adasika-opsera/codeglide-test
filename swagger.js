@@ -1,113 +1,52 @@
-const express = require('express');
+// Install swagger dependencies
+npm install swagger-jsdoc swagger-ui-express
+
+// In your main app file (e.g., app.js or server.js)
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
-const app = express();
-const PORT = 3000;
-
-// Sample repository data
-const repositories = [
-  { id: 1, name: 'awesome-project', owner: 'user1', stars: 42 },
-  { id: 2, name: 'cool-library', owner: 'user2', stars: 105 },
-  { id: 3, name: 'utility-tool', owner: 'user3', stars: 27 }
-];
-
-// Swagger definition
 const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Repository API',
+      title: 'My API',
       version: '1.0.0',
-      description: 'API for managing code repositories',
+      description: 'A simple Express API',
     },
     servers: [
       {
-        url: `http://localhost:${PORT}`,
+        url: 'http://localhost:3000',
+        description: 'Development server',
       },
     ],
-    components: {
-      schemas: {
-        Repository: {
-          type: 'object',
-          properties: {
-            id: {
-              type: 'integer',
-              example: 1
-            },
-            name: {
-              type: 'string',
-              example: 'awesome-project'
-            },
-            owner: {
-              type: 'string',
-              example: 'user1'
-            },
-            stars: {
-              type: 'integer',
-              example: 42
-            }
-          }
-        }
-      }
-    }
   },
-  apis: [], // No external files for this example
+  apis: ['./routes/*.js'], // Path to the API docs
 };
 
 const specs = swaggerJsdoc(options);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
-// API routes
+// In your route files, add JSDoc comments:
 /**
  * @swagger
- * /repositories:
+ * /users:
  *   get:
- *     summary: Get all repositories
+ *     summary: Get all users
  *     responses:
  *       200:
- *         description: A list of repositories
+ *         description: List of users
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/Repository'
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   name:
+ *                     type: string
  */
-app.get('/repositories', (req, res) => {
-  res.json(repositories);
-});
-
-/**
- * @swagger
- * /repositories/{id}:
- *   get:
- *     summary: Get a repository by ID
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: A single repository
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Repository'
- *       404:
- *         description: Repository not found
- */
-app.get('/repositories/:id', (req, res) => {
-  const repo = repositories.find(r => r.id === parseInt(req.params.id));
-  if (!repo) return res.status(404).send('Repository not found');
-  res.json(repo);
-});
-
-// Serve Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
-
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`Swagger UI available at http://localhost:${PORT}/api-docs`);
+app.get('/users', (req, res) => {
+  // Your route logic
 });
