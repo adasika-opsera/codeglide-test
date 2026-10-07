@@ -6,7 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
-function getConfig() {
+export function getConfig() {
   const baseURL = process.env.API_BASE_URL;
   const bearerToken = process.env.API_BEARER_TOKEN;
   
