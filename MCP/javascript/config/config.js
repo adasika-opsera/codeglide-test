@@ -32,9 +32,8 @@ export async function load_api_config() {
     const params = new URLSearchParams();
       // No parameters
     const queryString = params.toString();
-    const finalUrl = queryString ? `${url}?${queryString}` : url;
-    
     const url = `${config.baseURL}/api/unknown`;
+    const finalUrl = queryString ? `${url}?${queryString}` : url;
     
     const response = await fetch(finalUrl, {
       method: 'GET',

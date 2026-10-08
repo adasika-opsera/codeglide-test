@@ -4,18 +4,18 @@ import { load_api_config } from '../config/config.js';
 import { models } from '../models/models.js';
 
 /**
- * Characterization baseline: each handler references `url` before its `const`
- * declaration (TDZ). The ReferenceError is caught by the handler try/catch and
- * returned as a string — document that current broken behavior here.
+ * Post-fix characterization: handlers no longer TDZ-crash on `url`.
+ * With env config set they reach fetch(); placeholder `/api/unknown` may
+ * fail the request, but the result is always a string (JSON or error text).
  */
 const TDZ_URL_MESSAGE = /Cannot access 'url' before initialization/;
 
-describe('handler ReferenceError baseline', () => {
+describe('handler no-crash after url declaration fix', () => {
   const prevBaseURL = process.env.API_BASE_URL;
   const prevBearer = process.env.API_BEARER_TOKEN;
 
   beforeEach(() => {
-    process.env.API_BASE_URL = 'https://api.example.com';
+    process.env.API_BASE_URL = 'https://example.com';
     process.env.API_BEARER_TOKEN = 'test-token';
   });
 
@@ -32,21 +32,21 @@ describe('handler ReferenceError baseline', () => {
     }
   });
 
-  it('get_all fails with ReferenceError TDZ on url', async () => {
+  it('get_all returns a string without ReferenceError TDZ', async () => {
     const result = await get_all();
-    expect(result).toMatch(TDZ_URL_MESSAGE);
-    expect(result).toMatch(/^Request failed:/);
+    expect(typeof result).toBe('string');
+    expect(result).not.toMatch(TDZ_URL_MESSAGE);
   });
 
-  it('load_api_config fails with ReferenceError TDZ on url', async () => {
+  it('load_api_config returns a string without ReferenceError TDZ', async () => {
     const result = await load_api_config();
-    expect(result).toMatch(TDZ_URL_MESSAGE);
-    expect(result).toMatch(/^Request failed:/);
+    expect(typeof result).toBe('string');
+    expect(result).not.toMatch(TDZ_URL_MESSAGE);
   });
 
-  it('models fails with ReferenceError TDZ on url', async () => {
+  it('models returns a string without ReferenceError TDZ', async () => {
     const result = await models();
-    expect(result).toMatch(TDZ_URL_MESSAGE);
-    expect(result).toMatch(/^Request failed:/);
+    expect(typeof result).toBe('string');
+    expect(result).not.toMatch(TDZ_URL_MESSAGE);
   });
 });
